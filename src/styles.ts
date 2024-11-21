@@ -134,6 +134,14 @@ const styles = (params: StyleSheetParams = {}) =>
       textAlign: 'center',
       fontWeight: '600',
     },
+    pointer: {
+      position: 'absolute',
+      top: '20%',
+      width: 3,
+      height: scale(40),
+      borderRadius: 10,
+      backgroundColor: Colors.white, // Pointer color
+    },
   });
 
 export default styles;

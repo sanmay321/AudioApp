@@ -19,6 +19,8 @@ import React, {
 import {
   ActivityIndicator,
   Alert,
+  Animated,
+  Dimensions,
   Image,
   Linking,
   Pressable,
@@ -40,8 +42,7 @@ import {
   type ListItem,
 } from './constants';
 import stylesheet from './styles';
-import { Colors } from './theme';
-// import FastImage from 'react-native-fast-image';
+import { Colors, scale } from './theme';
 import fs from 'react-native-fs';
 
 let currentPlayingRef: React.RefObject<IWaveformRef> | undefined;
@@ -61,7 +62,14 @@ const RenderListItem = React.memo(
     const [playerState, setPlayerState] = useState(PlayerState.stopped);
     const styles = stylesheet({ currentUser: item.fromCurrentUser });
     const [isLoading, setIsLoading] = useState(true);
-
+    const [currentProgress, setCurrentProgress] = useState<number>(0); // Track progress
+    const [songDuration, setSongDuration] = useState<number>(1); // Default duration to avoid division by zero
+    const containerWidth = 325; // Example width, adjust as needed
+  
+  
+    // Calculate pointer position
+    const pointerPosition = (currentProgress / songDuration) ;
+    console.log('pointerPosition', pointerPosition)
     const handlePlayPauseAction = async () => {
       // If we are recording do nothing
       if (
@@ -147,6 +155,18 @@ const RenderListItem = React.memo(
                 />
               )}
             </Pressable>
+            <View style={{flex:1}}>
+
+            <Animated.View pointerEvents={'none'}
+        style={[
+          styles.pointer,
+          { 
+            //transform: [{ 
+            // translateX: pointerPosition }]
+          left:`${pointerPosition*100}%`
+           },
+        ]}
+      />
             <Waveform
               containerStyle={styles.staticWaveformView}
               mode="static"
@@ -168,11 +188,15 @@ const RenderListItem = React.memo(
                 console.log(
                   `currentProgress ${currentProgress}, songDuration ${songDuration}`
                 );
+                setCurrentProgress(currentProgress);
+                setSongDuration(songDuration);
               }}
               onChangeWaveformLoadState={state => {
                 setIsLoading(state);
               }}
             />
+            </View>
+            
             {playerState === PlayerState.playing ? (
               <Pressable
                 onPress={changeSpeed}
