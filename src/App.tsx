@@ -363,11 +363,11 @@ console.log('list', list)
         <View style={styles.screenBackground}>
           <View style={styles.container}>
             <View style={styles.headerContainer}>
-              <Image
+              {/* <Image
                 source={Icons.simform}
                 style={styles.simformImage}
                 resizeMode="contain"
-              />
+              /> */}
               <Pressable
                 style={[
                   styles.deleteRecordingContainer,
