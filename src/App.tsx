@@ -255,13 +255,46 @@ const LivePlayerComponent = ({
         Linking.openSettings();
       }
     } else {
-      ref.current?.stopRecord().then(path => {
-        setList(prev => [...prev, { fromCurrentUser: true, path }]);
+      ref.current?.stopRecord().then(async (path) => {
+        const downloadedPath = await downloadAudio('http://192.168.0.102:5001/audio');
+        setList((prev) => [
+          ...prev,
+          { fromCurrentUser: true, path: downloadedPath },
+        ]);
       });
+      
       currentPlayingRef = undefined;
     }
   };
 
+  const downloadAudio = async (url: string): Promise<string> => {
+    try {
+      // Define the download directory and file name
+      const downloadDir = fs.DocumentDirectoryPath;
+      const fileName = `audio_${Date.now()}.mp3`; // Generate a unique file name
+      const filePath = `${downloadDir}/${fileName}`;
+  
+      console.log('Downloading audio from:', url);
+      console.log('File will be saved to:', filePath);
+  
+      // Download the file
+      const result = await fs.downloadFile({
+        fromUrl: url,
+        toFile: filePath,
+      }).promise;
+  
+      // Check if the download was successful
+      if (result.statusCode === 200) {
+        console.log('Audio downloaded successfully:', filePath);
+        return filePath;
+      } else {
+        throw new Error(`Download failed with status code: ${result.statusCode}`);
+      }
+    } catch (error) {
+      console.error('Error downloading audio:', error);
+      // throw new Error(`Failed to download audio: ${error.message || error}`);
+    }
+  };
   return (
     <View style={styles.liveWaveformContainer}>
       <Waveform
