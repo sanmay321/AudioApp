@@ -1,0 +1,7 @@
+export const routeName = {
+  AUTH_STACK: 'AUTH_STACK',
+  HOME_STACK: 'HOME_STACK',
+  SPLASH: 'SPLASH',
+  LOGIN: 'LOGIN',
+  AUDIO_DEVICES:'AUDIO_DEVICES'
+};
