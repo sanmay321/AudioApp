@@ -35,6 +35,7 @@ const Login = ({ navigation }) => {
       <RnButton
         title={"Log In"}
         disabled={email == "" || Password == ""}
+        onPress={() => navigation.replace(routeName.HOME_STACK)}
       />
     </View>
   );
