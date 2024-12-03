@@ -58,9 +58,7 @@ const Device = ({ navigation }) => {
     <ImageBackground source={globalPath.backg} style={styles.container}>
       <SafeAreaView style={styles.container}>
         <Header title={"Device 1"} leftIcon rightIcon dots />
-        <View
-          style={styles.today}
-        >
+        <View style={styles.today}>
           <TouchableOpacity>
             <Icon source={globalPath.leftA} />
           </TouchableOpacity>
@@ -89,9 +87,7 @@ const Device = ({ navigation }) => {
           <View style={styles.time}>
             <ResponsiveText>04:40:45</ResponsiveText>
           </View>
-          <View
-            style={styles.control}
-          >
+          <View style={styles.control}>
             <TouchableOpacity>
               <Icon source={globalPath.dec} size={wp(7)} />
             </TouchableOpacity>
@@ -133,18 +129,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  control:{
+  control: {
     flexDirection: "row",
     alignItems: "center",
     width: wp(40),
     justifyContent: "space-between",
   },
-  today:{
+  today: {
     flexDirection: "row",
     alignSelf: "center",
     width: wp(40),
     justifyContent: "space-between",
     marginVertical: hp(2),
-
-  }
+  },
 });
