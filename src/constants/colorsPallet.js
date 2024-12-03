@@ -5,7 +5,7 @@ export const colors = {
   buttongreen:'#00D593',
   notificationGreen:'#00d87f',
 
-  transparent:'rgba(52, 52, 52, 0.8)',
+  transparent:'rgba(52, 52, 52, 0.9)',
   grey: '#F5F5F5',
   light_blue: '#e1f3fa',
   black: '#000000',

@@ -47,6 +47,7 @@ const Input = forwardRef(({
   onPressright,
   rightIcon,
   editable,
+  textAlign,
   textTransform,
   ...props
 }, ref) => {
@@ -79,6 +80,7 @@ const Input = forwardRef(({
         style={[
           {fontSize: isNaN(fontSize) ? wp(3) : wp(fontSize)},
           styles.Input,
+          textAlign&&{textAlign},
           multiline && {
             textAlignVertical: 'top',
             paddingVertical: 15,

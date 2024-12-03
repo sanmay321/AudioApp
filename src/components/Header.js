@@ -1,18 +1,45 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
-import ResponsiveText from './RnText';
-import {colors} from '../constants/colorsPallet';
-import {hp, wp} from '../helpers/Responsiveness';
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import ResponsiveText from "./RnText";
+import { colors } from "../constants/colorsPallet";
+import { hp, wp } from "../helpers/Responsiveness";
+import Icon from "./Icon";
+import { globalPath } from "../constants/globalPath";
 
-const Header = ({title}) => {
+const Header = ({ title, rightIcon,leftIcon, dots }) => {
   return (
     <View
       style={{
         backgroundColor: colors.grey1,
-        alignItems: 'center',
-        paddingVertical: wp(5),
-      }}>
-      <ResponsiveText size={4} weight={'bold'} color={colors.white} >{title}</ResponsiveText>
+        alignItems: "center",
+        padding: wp(5),
+        flexDirection: "row",
+        justifyContent: rightIcon ? "space-between" : "center",
+      }}
+    >
+      {rightIcon &&
+        (leftIcon ? (
+          <TouchableOpacity>
+            <Icon source={globalPath.leftA} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity>
+            <Icon source={globalPath.logou} />
+          </TouchableOpacity>
+        ))}
+      <ResponsiveText size={4} weight={"bold"} color={colors.white}>
+        {title}
+      </ResponsiveText>
+      {rightIcon &&
+        (dots ? (
+          <TouchableOpacity>
+            <Icon source={globalPath.dots} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity>
+            <Icon source={globalPath.logout} />
+          </TouchableOpacity>
+        ))}
     </View>
   );
 };
