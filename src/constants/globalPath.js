@@ -12,6 +12,9 @@ const leftA = require("../assets/icons/leftA.png");
 const rightA = require("../assets/icons/rightA.png");
 const voice = require("../assets/icons/voice.png");
 const pause = require("../assets/icons/pause.png");
+const play = require("../assets/icons/play.png");
+const replay = require("../assets/icons/replay.png");
+
 
 
 
@@ -20,6 +23,8 @@ const backg = require("../assets/Image/backg.png");
 
 
 export const globalPath = {
+  replay,
+  play,
   Frame,
   backg,
   dropdown,
