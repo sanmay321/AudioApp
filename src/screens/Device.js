@@ -1,3 +1,4 @@
+
 import {
   ActivityIndicator,
   Animated,
@@ -9,7 +10,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View,Button,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,6 +24,7 @@ import DropDown from "../components/DropDown";
 import Input from "../components/Input";
 import RnButton from "../components/RnButton";
 import { routeName } from "../constants/routeName";
+import Sound from 'react-native-sound';
 import TrackPlayer, {
   Capability,
   RatingType,
@@ -33,38 +35,131 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { Colors } from "../theme";
 import Slider from "@react-native-community/slider";
-
+import DatePicker from 'react-native-date-picker';
+import { BASE_URL } from "../config/Config";
 const Device = ({ navigation }) => {
   const [openModal, setOpenModal] = useState(false);
   const [linePosition, setLinePosition] = useState(new Animated.Value(0)); // Track red line position
+  const [player, setPlayer] = useState(null);
+  const [duration, setDuration] = useState(0); // Total duration of the audio
+  const [currentPosition, setCurrentPosition] = useState(0); // Current playback position
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+  const audioUrl1 = `${BASE_URL}/output_audio/playlist.m3u8`;
+  const audioUrl2 = `${BASE_URL}/output_audio1/playlist.m3u8`;
+  const [audioUrl,setAudioUrl] = useState(audioUrl1);
 
-  const audioUrl = "https://download.samplelib.com/mp3/sample-15s.mp3";
+  // Increment and Decrement Date Functions
+  const incrementDate = () => {
+    setDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setDate(newDate.getDate() + 1);
+      return newDate;
+    });
+    setAudioUrl(audioUrl1);
+  };
+
+  const decrementDate = () => {
+    setDate((prevDate) => {
+      const newDate = new Date(prevDate);
+      newDate.setDate(newDate.getDate() - 1);
+      return newDate;
+    });
+    setAudioUrl(audioUrl2);
+  };
+
+
+  useEffect(() => {
+    Sound.setCategory('Playback');
+
+    const sound = new Sound(
+      audioUrl,
+      Sound.MAIN_BUNDLE,
+      (error) => {
+        if (error) {
+          console.error('Failed to load the sound', error);
+          return;
+        }
+        setDuration(sound.getDuration());
+        sound.play(() => sound.release()); // Play and release the sound when finished
+      }
+    
+    );
+
+
+    setPlayer(sound);
+
+    // Clean up
+    return () => {
+      if (sound) {
+        sound.release();
+      }
+    };
+  }, [audioUrl]);
+
+  const updateCurrentPosition = () => {
+    if (player) {
+      player.getCurrentTime((seconds) => {
+        setCurrentPosition(seconds);
+      });
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(updateCurrentPosition, 1000); // Update current position every second
+    return () => clearInterval(interval);
+  }, [player]);
+
+  const handleSlidingComplete = (value) => {
+    if (player) {
+      player.setCurrentTime(value); // Seek to the specified time
+    }
+  };
+
+
+
+
+
+
+
+
 
   const playbackState = usePlaybackState();
   useSetupTrackPlayer();
   const handleStartPlayingAudio = async () => {
-    console.log("adding");
-    await TrackPlayer.reset();
-    await TrackPlayer.add([
-      {
-        title: "A sample title",
-        url: audioUrl,
-        // artist: track.uploadedBy,
-        // artwork: 'https://images.unsplash.com/photo-1620565404258-27ef4fbb0b72',
-      },
-    ]);
-    await TrackPlayer.play();
+    try {
+      console.log("Resetting TrackPlayer");
+      await TrackPlayer.reset();
+  
+      console.log("Adding Track");
+      await TrackPlayer.add({
+        id: "1", // Unique track ID
+        title: "Sample HLS Audio",
+        artist: "Unknown Artist",
+        artwork: "https://via.placeholder.com/150", // Optional artwork URL
+        url: audioUrl, // M3U8 file URL
+        type: "audio", // Explicitly define the type
+      });
+  
+      console.log("Starting Playback");
+      await TrackPlayer.play();
+    } catch (error) {
+      console.error("Error in handleStartPlayingAudio:", error);
+    }
   };
-  const { duration, position } = useProgress();
+  
+  const { Duration, position } = useProgress();
   useEffect(() => {
-    if (duration > 0) {
-      const percentage = position / duration; // Calculate playback percentage
+    if (Duration > 0) {
+      const percentage = position / Duration; // Calculate playback percentage
       const lineX = percentage * 100; // Calculate the red line's X position (timelineWidth is your ScrollView's width)
 
       // Animate the red line's movement
       Animated.timing(linePosition, {
         toValue: lineX,
-        duration: 100, // Adjust for smooth movement
+        Duration: 100, // Adjust for smooth movement
         useNativeDriver: false,
       }).start();
     }
@@ -106,14 +201,31 @@ const Device = ({ navigation }) => {
       <SafeAreaView style={styles.container}>
         <Header title={"Device 1"} leftIcon rightIcon dots />
         <View style={styles.today}>
-          <TouchableOpacity>
-            <Icon source={globalPath.leftA} />
-          </TouchableOpacity>
-          <ResponsiveText>Today</ResponsiveText>
-          <TouchableOpacity>
-            <Icon source={globalPath.rightA} />
-          </TouchableOpacity>
+        <TouchableOpacity onPress={decrementDate}>
+        <Icon source={globalPath.leftA} style={styles.icon} />
+        </TouchableOpacity>
+
+        <Text style={styles.dateText}>
+          {date.toDateString()} {/* Display selected date */}
+        </Text>
+
+        <TouchableOpacity onPress={incrementDate}>
+        <Icon source={globalPath.rightA} style={styles.icon} />
+        </TouchableOpacity>
         </View>
+        {/* <Button title="Select Date" onPress={() => setOpen(true)} /> */}
+
+{/* Date Picker Modal */}
+<DatePicker
+  modal
+  open={open}
+  date={date}
+  onConfirm={(selectedDate) => {
+    setOpen(false);
+    setDate(selectedDate);
+  }}
+  onCancel={() => setOpen(false)}
+/>
         <View style={{ height: hp(20) }}>
           <ScrollView
             horizontal
@@ -180,7 +292,7 @@ const Device = ({ navigation }) => {
                   <Slider
                     value={position}
                     minimumValue={0}
-                    maximumValue={duration}
+                    maximumValue={Duration}
                     thumbTintColor={colors.red}
                     minimumTrackTintColor={colors.white}
                     maximumTrackTintColor={colors.BtnClr}
@@ -205,7 +317,35 @@ const Device = ({ navigation }) => {
             /> */}
           </View>
         </View>
-
+    <View style={styles.container}>
+      <Text style={styles.title}>Audio Stream Player</Text>
+      <Slider
+        style={styles.slider}
+        minimumValue={0}
+        maximumValue={duration}
+        value={currentPosition}
+        onSlidingComplete={handleSlidingComplete}
+        minimumTrackTintColor="#1EB1FC"
+        maximumTrackTintColor="#8e8e93"
+        thumbTintColor="#1EB1FC"
+      />
+      <View style={styles.timeContainer}>
+        <Text style={styles.timeText}>{formatTime(currentPosition)}</Text>
+        <Text style={styles.timeText}>{formatTime(duration)}</Text>
+      </View>
+      <Button
+        title="Pause"
+        onPress={() => {
+          if (player) player.pause();
+        }}
+      />
+      <Button
+        title="Play"
+        onPress={() => {
+          if (player) player.play();
+        }}
+      />
+    </View>
         <View style={styles.controlerContainer}>
           <View style={styles.time}>
             <ResponsiveText>{convertSecondsToTime(position)}</ResponsiveText>
@@ -229,10 +369,10 @@ const Device = ({ navigation }) => {
                   console.log("TrackPlayer", await TrackPlayer.getProgress());
 
                   playbackState.state === State.Playing
-                    ? TrackPlayer.pause()
+                    ? player.pause()
                     : playbackState.state === State.Paused ||
                       playbackState.state === State.Ready
-                    ? TrackPlayer.play()
+                    ? player.play()
                     : handleStartPlayingAudio();
                 }}
               >
@@ -248,7 +388,7 @@ const Device = ({ navigation }) => {
             )}
             <TouchableOpacity
               onPress={async () => {
-                await TrackPlayer.seekBy(15);
+                await TrackPlayer.seekBy(150);
               }}
             >
               <Icon source={globalPath.increase} size={wp(7)} />
@@ -268,11 +408,22 @@ const Device = ({ navigation }) => {
 
 export default Device;
 
+const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
+  timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+    marginTop: 10,
+  },
   controlerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -343,6 +494,7 @@ const styles = StyleSheet.create({
     height: hp(19),
     backgroundColor: "red",
   },
+  
 });
 
 //you can move this to its own folder
@@ -392,3 +544,48 @@ function convertSecondsToTime(seconds) {
 
   return `${hours}:${minutes}:${secs}`;
 }
+
+// // App.js
+// import React, { useEffect } from 'react';
+// import { View, Button } from 'react-native';
+// import TrackPlayer from 'react-native-track-player';
+// import { setupPlayer, addTrack } from './playerService';
+
+// const Device = () => {
+//     useEffect(() => {
+//         const initializePlayer = async () => {
+//             const isSetup = await setupPlayer();
+//             if (isSetup) {
+//                 await addTrack('http://192.168.137.229:5002/output_audio/playlist.m3u8');
+//                 await TrackPlayer.play();
+//             }
+//         };
+
+//         initializePlayer();
+
+//         return () => {
+//             TrackPlayer.destroy(); // Cleanup on unmount
+//         };
+//     }, []);
+
+//     const seekForward = async () => {
+//         const position = await TrackPlayer.getProgress().then((progress) => progress.position);
+//         await TrackPlayer.seekTo(position + 15); // Seek forward 15 seconds
+//     };
+
+//     const seekBackward = async () => {
+//         const position = await TrackPlayer.getProgress().then((progress) => progress.position);
+//         await TrackPlayer.seekTo(Math.max(0, position - 15)); // Seek backward 15 seconds
+//     };
+
+//     return (
+//         <View>
+//             <Button title="Play" onPress={() => TrackPlayer.play()} />
+//             <Button title="Pause" onPress={() => TrackPlayer.pause()} />
+//             <Button title="Seek Forward 15s" onPress={seekForward} />
+//             <Button title="Seek Backward 15s" onPress={seekBackward} />
+//         </View>
+//     );
+// };
+
+// export default Device;

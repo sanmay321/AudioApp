@@ -3,6 +3,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {routeName} from '../constants/routeName';
 import AudioDevices from '../screens/AudioDevices';
 import Device from '../screens/Device';
+import AudioPlayer from '../screens/AudioPlayer';
+import WaveformVisualizer from '../screens/WaveformVisualizer';
 
 
 const HomeStack = () => {
