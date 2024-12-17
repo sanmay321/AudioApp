@@ -1,4 +1,3 @@
-
 import {
   ActivityIndicator,
   Animated,
@@ -10,7 +9,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,Button,
+  View,
+  Button,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,7 +24,7 @@ import DropDown from "../components/DropDown";
 import Input from "../components/Input";
 import RnButton from "../components/RnButton";
 import { routeName } from "../constants/routeName";
-import Sound from 'react-native-sound';
+import Sound from "react-native-sound";
 import TrackPlayer, {
   Capability,
   RatingType,
@@ -35,7 +35,7 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { Colors } from "../theme";
 import Slider from "@react-native-community/slider";
-import DatePicker from 'react-native-date-picker';
+import DatePicker from "react-native-date-picker";
 import { BASE_URL } from "../config/Config";
 const Device = ({ navigation }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -49,7 +49,7 @@ const Device = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const audioUrl1 = `${BASE_URL}/output_audio/playlist.m3u8`;
   const audioUrl2 = `${BASE_URL}/output_audio1/playlist.m3u8`;
-  const [audioUrl,setAudioUrl] = useState(audioUrl1);
+  const [audioUrl, setAudioUrl] = useState(audioUrl1);
 
   // Increment and Decrement Date Functions
   const incrementDate = () => {
@@ -70,24 +70,17 @@ const Device = ({ navigation }) => {
     setAudioUrl(audioUrl2);
   };
 
-
   useEffect(() => {
-    Sound.setCategory('Playback');
+    Sound.setCategory("Playback");
 
-    const sound = new Sound(
-      audioUrl,
-      Sound.MAIN_BUNDLE,
-      (error) => {
-        if (error) {
-          console.error('Failed to load the sound', error);
-          return;
-        }
-        setDuration(sound.getDuration());
-        sound.play(() => sound.release()); // Play and release the sound when finished
+    const sound = new Sound(audioUrl, Sound.MAIN_BUNDLE, (error) => {
+      if (error) {
+        console.error("Failed to load the sound", error);
+        return;
       }
-    
-    );
-
+      setDuration(sound.getDuration());
+      sound.play(() => sound.release()); // Play and release the sound when finished
+    });
 
     setPlayer(sound);
 
@@ -118,21 +111,13 @@ const Device = ({ navigation }) => {
     }
   };
 
-
-
-
-
-
-
-
-
   const playbackState = usePlaybackState();
   useSetupTrackPlayer();
   const handleStartPlayingAudio = async () => {
     try {
       console.log("Resetting TrackPlayer");
       await TrackPlayer.reset();
-  
+
       console.log("Adding Track");
       await TrackPlayer.add({
         id: "1", // Unique track ID
@@ -142,14 +127,14 @@ const Device = ({ navigation }) => {
         url: audioUrl, // M3U8 file URL
         type: "audio", // Explicitly define the type
       });
-  
+
       console.log("Starting Playback");
       await TrackPlayer.play();
     } catch (error) {
       console.error("Error in handleStartPlayingAudio:", error);
     }
   };
-  
+
   const { Duration, position } = useProgress();
   useEffect(() => {
     if (Duration > 0) {
@@ -201,31 +186,33 @@ const Device = ({ navigation }) => {
       <SafeAreaView style={styles.container}>
         <Header title={"Device 1"} leftIcon rightIcon dots />
         <View style={styles.today}>
-        <TouchableOpacity onPress={decrementDate}>
-        <Icon source={globalPath.leftA} style={styles.icon} />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={decrementDate}>
+            <Icon source={globalPath.leftA} style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setOpen(true)}>
+            <ResponsiveText>
+              {date.toDateString()} {/* Display selected date */}
+            </ResponsiveText>
+          </TouchableOpacity>
 
-        <Text style={styles.dateText}>
-          {date.toDateString()} {/* Display selected date */}
-        </Text>
-
-        <TouchableOpacity onPress={incrementDate}>
-        <Icon source={globalPath.rightA} style={styles.icon} />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={incrementDate}>
+            <Icon source={globalPath.rightA} style={styles.icon} />
+          </TouchableOpacity>
         </View>
         {/* <Button title="Select Date" onPress={() => setOpen(true)} /> */}
 
-{/* Date Picker Modal */}
-<DatePicker
-  modal
-  open={open}
-  date={date}
-  onConfirm={(selectedDate) => {
-    setOpen(false);
-    setDate(selectedDate);
-  }}
-  onCancel={() => setOpen(false)}
-/>
+        {/* Date Picker Modal */}
+        <DatePicker
+          modal
+          mode="date"
+          open={open}
+          date={date}
+          onConfirm={(selectedDate) => {
+            setOpen(false);
+            setDate(selectedDate);
+          }}
+          onCancel={() => setOpen(false)}
+        />
         <View style={{ height: hp(20) }}>
           <ScrollView
             horizontal
@@ -317,35 +304,35 @@ const Device = ({ navigation }) => {
             /> */}
           </View>
         </View>
-    <View style={styles.container}>
-      <Text style={styles.title}>Audio Stream Player</Text>
-      <Slider
-        style={styles.slider}
-        minimumValue={0}
-        maximumValue={duration}
-        value={currentPosition}
-        onSlidingComplete={handleSlidingComplete}
-        minimumTrackTintColor="#1EB1FC"
-        maximumTrackTintColor="#8e8e93"
-        thumbTintColor="#1EB1FC"
-      />
-      <View style={styles.timeContainer}>
-        <Text style={styles.timeText}>{formatTime(currentPosition)}</Text>
-        <Text style={styles.timeText}>{formatTime(duration)}</Text>
-      </View>
-      <Button
-        title="Pause"
-        onPress={() => {
-          if (player) player.pause();
-        }}
-      />
-      <Button
-        title="Play"
-        onPress={() => {
-          if (player) player.play();
-        }}
-      />
-    </View>
+        <View style={styles.container}>
+          <Text style={styles.title}>Audio Stream Player</Text>
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={duration}
+            value={currentPosition}
+            onSlidingComplete={handleSlidingComplete}
+            minimumTrackTintColor="#1EB1FC"
+            maximumTrackTintColor="#8e8e93"
+            thumbTintColor="#1EB1FC"
+          />
+          <View style={styles.timeContainer}>
+            <Text style={styles.timeText}>{formatTime(currentPosition)}</Text>
+            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+          </View>
+          <Button
+            title="Pause"
+            onPress={() => {
+              if (player) player.pause();
+            }}
+          />
+          <Button
+            title="Play"
+            onPress={() => {
+              if (player) player.play();
+            }}
+          />
+        </View>
         <View style={styles.controlerContainer}>
           <View style={styles.time}>
             <ResponsiveText>{convertSecondsToTime(position)}</ResponsiveText>
@@ -409,19 +396,19 @@ const Device = ({ navigation }) => {
 export default Device;
 
 const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   timeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '90%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "90%",
     marginTop: 10,
   },
   controlerContainer: {
@@ -494,7 +481,6 @@ const styles = StyleSheet.create({
     height: hp(19),
     backgroundColor: "red",
   },
-  
 });
 
 //you can move this to its own folder
