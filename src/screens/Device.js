@@ -112,7 +112,7 @@ const Device = ({ navigation }) => {
   };
 
   const playbackState = usePlaybackState();
-  console.log("State", playbackState, State);
+  // console.log("State", playbackState, State);
   useSetupTrackPlayer();
   const handleStartPlayingAudio = async () => {
     try {
@@ -168,7 +168,7 @@ const Device = ({ navigation }) => {
       audioDuration: i === 7 ? 100 : null, // Example: 100 seconds duration for 7:30 AM slot
     };
   });
-  console.log("HOURS", HOURS);
+  // console.log("HOURS", HOURS);
 
   const scrollViewRef = useRef(null);
 
@@ -182,6 +182,21 @@ const Device = ({ navigation }) => {
       });
     }
   }, []);
+  const handleSeekBackward = () => {
+    if (player) {
+      const newPosition = Math.max(currentPosition - 15, 0);
+      player.setCurrentTime(newPosition);
+      setCurrentPosition(newPosition);
+    }
+  };
+  const handleSeekForward = () => {
+    // console.log('player', player.isPlaying())
+    if (player) {
+      const newPosition = Math.min(currentPosition + 15, duration);
+      player.setCurrentTime(newPosition);
+      setCurrentPosition(newPosition);
+    }
+  };
   return (
     <ImageBackground source={globalPath.backg} style={styles.container}>
       <SafeAreaView style={styles.container}>
@@ -305,9 +320,11 @@ const Device = ({ navigation }) => {
             />
           </View>
         </View>
-         {/* Seekbar */}
+        {/* Seekbar */}
         <View>
-          <ResponsiveText textAlign={'center'}>Audio Stream Player</ResponsiveText>
+          <ResponsiveText textAlign={"center"}>
+            Audio Stream Player
+          </ResponsiveText>
           <Slider
             style={styles.slider}
             minimumValue={0}
@@ -342,7 +359,8 @@ const Device = ({ navigation }) => {
           <View style={styles.control}>
             <TouchableOpacity
               onPress={async () => {
-                await TrackPlayer.seekBy(-15);
+                // await TrackPlayer.seekBy(-15);
+                handleSeekBackward();
               }}
             >
               <Icon source={globalPath.dec} size={wp(7)} />
@@ -355,21 +373,28 @@ const Device = ({ navigation }) => {
                 onPress={async () => {
                   // console.log(playbackState.state);
                   // return;
-                  console.log("TrackPlayer", await TrackPlayer.getProgress());
+                  // console.log("TrackPlayer", await TrackPlayer.getProgress());
 
-                  playbackState.state === State.Playing
-                    ? player.pause()
-                    : playbackState.state === State.Paused ||
-                      playbackState.state === State.Ready
-                    ? player.play()
-                    : handleStartPlayingAudio();
+                  // playbackState.state === State.Playing
+                  //   ? player.pause()
+                  //   : playbackState.state === State.Paused ||
+                  //     playbackState.state === State.Ready
+                  //   ? player.play()
+                  //   : handleStartPlayingAudio();
+
+                  if (player.isPlaying()) {
+                    player.pause();
+                  } else {
+                    player.play();
+                  }
                 }}
               >
                 <Icon
                   source={
-                    playbackState.state === State.Playing
+                    // playbackState.state === State.Playing
+                    player.isPlaying()
                       ? globalPath.pause
-                      : globalPath.pause //replace with the play icon
+                      : globalPath.play //replace with the play icon
                   }
                   size={wp(5)}
                 />
@@ -377,7 +402,8 @@ const Device = ({ navigation }) => {
             )}
             <TouchableOpacity
               onPress={async () => {
-                await TrackPlayer.seekBy(150);
+                // await TrackPlayer.seekBy(15);
+                handleSeekForward();
               }}
             >
               <Icon source={globalPath.increase} size={wp(7)} />
