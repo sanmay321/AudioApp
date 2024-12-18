@@ -112,6 +112,7 @@ const Device = ({ navigation }) => {
   };
 
   const playbackState = usePlaybackState();
+  console.log("State", playbackState, State);
   useSetupTrackPlayer();
   const handleStartPlayingAudio = async () => {
     try {
@@ -280,13 +281,13 @@ const Device = ({ navigation }) => {
                     value={position}
                     minimumValue={0}
                     maximumValue={Duration}
-                    thumbTintColor={colors.red}
-                    minimumTrackTintColor={colors.white}
-                    maximumTrackTintColor={colors.BtnClr}
+                    minimumTrackTintColor="#1EB1FC"
+                    maximumTrackTintColor="#8e8e93"
+                    thumbTintColor="#1EB1FC"
                     onSlidingComplete={async (value) =>
                       await TrackPlayer.seekTo(value)
                     }
-                    thumbImage={require("./../assets/icons/redline-removebg-preview.png")}
+                    // thumbImage={require("./../assets/icons/redline-removebg-preview.png")}
                   />
                 )}
               </View>
@@ -296,16 +297,17 @@ const Device = ({ navigation }) => {
           {/* Current time marker */}
           <View style={styles.markerContainer}>
             {/* <View style={styles.marker} /> */}
-            {/* <Animated.View
+            <Animated.View
               style={[
                 styles.marker,
                 { transform: [{ translateX: linePosition }] },
               ]}
-            /> */}
+            />
           </View>
         </View>
-        <View style={styles.container}>
-          <Text style={styles.title}>Audio Stream Player</Text>
+         {/* Seekbar */}
+        <View>
+          <ResponsiveText textAlign={'center'}>Audio Stream Player</ResponsiveText>
           <Slider
             style={styles.slider}
             minimumValue={0}
@@ -317,10 +319,10 @@ const Device = ({ navigation }) => {
             thumbTintColor="#1EB1FC"
           />
           <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>{formatTime(currentPosition)}</Text>
-            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+            <ResponsiveText>{formatTime(currentPosition)}</ResponsiveText>
+            <ResponsiveText>{formatTime(duration)}</ResponsiveText>
           </View>
-          <Button
+          {/* <Button
             title="Pause"
             onPress={() => {
               if (player) player.pause();
@@ -331,7 +333,7 @@ const Device = ({ navigation }) => {
             onPress={() => {
               if (player) player.play();
             }}
-          />
+          /> */}
         </View>
         <View style={styles.controlerContainer}>
           <View style={styles.time}>
@@ -367,7 +369,7 @@ const Device = ({ navigation }) => {
                   source={
                     playbackState.state === State.Playing
                       ? globalPath.pause
-                      : globalPath.plus //replace with the play icon
+                      : globalPath.pause //replace with the play icon
                   }
                   size={wp(5)}
                 />
