@@ -5,8 +5,10 @@ import { colors } from "../constants/colorsPallet";
 import { hp, wp } from "../helpers/Responsiveness";
 import Icon from "./Icon";
 import { globalPath } from "../constants/globalPath";
+import { useNavigation } from "@react-navigation/native";
 
 const Header = ({ title, rightIcon,leftIcon, dots }) => {
+  const navigation=useNavigation()
   return (
     <View
       style={{
@@ -19,7 +21,7 @@ const Header = ({ title, rightIcon,leftIcon, dots }) => {
     >
       {rightIcon &&
         (leftIcon ? (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.goBack()}>
             <Icon source={globalPath.leftA} />
           </TouchableOpacity>
         ) : (

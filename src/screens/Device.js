@@ -382,7 +382,7 @@ const Device = ({ navigation }) => {
                   //   ? player.play()
                   //   : handleStartPlayingAudio();
 
-                  if (player.isPlaying()) {
+                  if (player?.isPlaying()) {
                     player.pause();
                   } else {
                     player.play();
@@ -392,7 +392,7 @@ const Device = ({ navigation }) => {
                 <Icon
                   source={
                     // playbackState.state === State.Playing
-                    player.isPlaying()
+                    player?.isPlaying()
                       ? globalPath.pause
                       : globalPath.play //replace with the play icon
                   }
